@@ -34,6 +34,7 @@
     <Compile Include="app.js" />
     <Compile Include="public\javascripts\jquery.js" />
     <Compile Include="public\javascripts\logger.js" />
+    <Compile Include="public\javascripts\m.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\log.js" />
     <Compile Include="routes\users.js" />

@@ -13,6 +13,7 @@ var loggerApi = {
         var logger = {};
         return $.Deferred(function (defer) {
             var ws = new WebSocket("ws://" + window.location.host  + "/ws");
+            logger.socket = ws;
             ws.onopen = function()
             {
                 logger.sub = function (logname) {

@@ -3,8 +3,11 @@
 
     <script src="javascripts/jquery.js"></script>
     <script src="javascripts/logger.js"></script>
+    <script src="javascripts/m.js"></script>
     <script>
-        var l = loggerApi.createLogger("log1").then(putter("x"));
+
+
+
 
       //function WebSocketTest() {
       //  if ("WebSocket" in window)
@@ -37,8 +40,67 @@
       //  }
       //  }
     </script>
+    <style>
+        .logview-container {
+            height:500px;
+            width:800px;
+            overflow:hidden;
+            border:2px solid red;
+            position:relative;
+            box-sizing:border-box;
+            padding-top: 50px;
+        }
+
+        .logview-container h3 {
+            height:50px;
+            width:100%;
+            top:0;
+            background-color:black;color:white;
+            margin:0;
+            position:absolute;
+        }
+
+        .logview-container .logview {
+            box-sizing:border-box;
+            border:2px solid green;
+            height:100%;
+            overflow:auto;
+        }
+    </style>
 </head>
 <body>
+    <div class="loglist">
 
+    </div>
+    <div class="logviews">
+
+    </div>
+    <script>
+
+        loggerApi.createLogger("log1").then(function (logger) {
+            lg = logger;
+            $.get("/log").then(function (result) {
+                result.forEach(function (item) {
+                    $(".loglist").append(Mustache.render("<div data-item='{{.}}'>{{.}}</div>", item));
+                });
+
+
+            });
+
+            logger.onmessage = function (message) {
+                var stor = ".logview." + message.channel;
+                console.log(stor);
+                $(stor).prepend("<div>" + JSON.stringify(message.msg) + "</div>");
+            }
+
+            $(document).on("click", "[data-item]", function () {
+                var log = $(this).data("item");
+                $(".logviews").append(Mustache.render("<div class='logview-container'><h3>{{.}}</h3><div class='logview {{.}}'></div></div>",log));
+                logger.sub(log);
+            })
+        });
+
+
+    </script>
 </body>
 </html>
