@@ -32,8 +32,8 @@ module.exports = app;
 app.createRedisClient = function () {
     //
     console.log("creating redis client");
-    return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
-    //return redis.createClient();
+    //return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
+    return redis.createClient();
 }
 //app.use('/', routes);
 app.use('/users', users);
