@@ -8,7 +8,7 @@ var rc;
 router.get('/', function (req, res) {
     rc = rc || redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
     rc.pubsub("channels", function (err, result) {
-        rc.end();
+        //rc.end();
         res.json(result);
     });
 });
