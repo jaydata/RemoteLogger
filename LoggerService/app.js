@@ -79,7 +79,7 @@ app.listen = function (port, done) {
     });
     
     wss.on('connection', function (clientSocket) {
-        console.log("wss connection", clientSocket);
+        console.log("wss connection");
         
         clientSocket.on('message', function (msg) {
             console.log("client message arrived", msg);
@@ -102,10 +102,10 @@ app.listen = function (port, done) {
                         break;
                     case "send":
                         //6379, "caravan-test-proxy1.cloudapp.net")
-                        console.log("publishing message", msg.data);
+                        //console.log("publishing message", msg.data);
                         var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
                         rc.publish(msg.channel, JSON.stringify({ t: msg.sent, d: msg.data }));
-                        console.log("publishing message done");
+                        //console.log("publishing message done");
                         break;
                 }
             }            ;
