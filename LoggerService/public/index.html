@@ -73,7 +73,7 @@
 
     </div>
     <div>
-        <input name="logname"/> <button>Watch feed</button>
+        <input class="logname"/> <button>Watch feed</button>
     </div>
     <div class="logviews">
 
@@ -83,7 +83,7 @@
         var _loger = loggerApi.createLogger("log1");
         _loger.log("asdasd");
         _loger.log("dasdasd");
-            _loger.then(function (logger) {
+        _loger.then(function (logger) {
             lg = logger;
             $.get("/log").then(function (result) {
                 result.forEach(function (item) {
