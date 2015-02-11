@@ -31,6 +31,8 @@ var loggerApi = {
             };
 
             ws.onmessage = function (message) {
+                var msg = JSON.parse(message.data);
+                logger.onmessage && logger.onmessage(msg);
                 console.log("client msg in", arguments)
             }
 
