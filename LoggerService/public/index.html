@@ -72,12 +72,18 @@
     <div class="loglist">
 
     </div>
+    <div>
+        <input name="logname"/> <button>Watch feed</button>
+    </div>
     <div class="logviews">
 
     </div>
     <script>
 
-        loggerApi.createLogger("log1").then(function (logger) {
+        var _loger = loggerApi.createLogger("log1");
+        _loger.log("asdasd");
+        _loger.log("dasdasd");
+            _loger.then(function (logger) {
             lg = logger;
             $.get("/log").then(function (result) {
                 result.forEach(function (item) {
@@ -91,11 +97,19 @@
                 var stor = ".logview." + message.channel;
                 $(stor).prepend("<div>" + JSON.stringify(message.msg) + "</div>");
             }
+    
+            function subtolog(log) {
+                $(".logviews").append(Mustache.render("<div class='logview-container'><h3>{{.}}</h3><div class='logview {{.}}'></div></div>", log));
+                logger.sub(log);
+            }
+
+            $("button").on("click", function () {
+                subtolog($('.logname').val());
+            });
 
             $(document).on("click", "[data-item]", function () {
                 var log = $(this).data("item");
-                $(".logviews").append(Mustache.render("<div class='logview-container'><h3>{{.}}</h3><div class='logview {{.}}'></div></div>",log));
-                logger.sub(log);
+                subtolog(log);
             })
         });
 
