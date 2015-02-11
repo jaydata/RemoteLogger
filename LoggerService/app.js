@@ -85,6 +85,7 @@ app.listen = function (port, done) {
                     if (!clientSocket.reveiving) {
                         clientSocket.reveiving = true;
                         rc.on("message", function (channel, msg) {
+                            msg = JSON.parse(msg);
                             clientSocket.send(JSON.stringify({ channel: channel, msg: msg }));
                         });
                     }
@@ -92,7 +93,7 @@ app.listen = function (port, done) {
                 case "send":
                     console.log("publishing message", msg.data);
                     var rc = clientSocket.sender || (clientSocket.sender = redis.createClient(6379, "caravan-test-proxy1.cloudapp.net"));
-                    rc.publish(msg.channel, msg.data);
+                    rc.publish(msg.channel, JSON.stringify({ d: msg.data, t: msg.sent }));
                     console.log("publishing message done");
                     break;
             }
