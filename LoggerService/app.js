@@ -66,7 +66,7 @@ module.exports = app;
 var appListen = app.listen;
 app.listen = function (port, done) {
     var server = appListen.apply(app, [port, done]);
-    var wss = new WebSocketServer( {server: server, port:8080, path: "/ws"
+    var wss = new WebSocketServer( {server: server, path: "/ws"
 });
     
     wss.on('connection', function (clientSocket) {

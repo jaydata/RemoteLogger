@@ -12,7 +12,7 @@ var loggerApi = {
     createLogger: function (name) {
         var logger = {};
         return $.Deferred(function (defer) {
-            var ws = new WebSocket("wss://" + window.location.host  + ":443/ws");
+            var ws = new WebSocket("ws://" + window.location.host  + "/ws");
             ws.onopen = function()
             {
                 logger.sub = function (logname) {
