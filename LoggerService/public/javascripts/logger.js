@@ -21,7 +21,7 @@ var loggerApi = {
 
                 logger.log = function (data, logname) {
                     window.setTimeout(function () {
-                        ws.send(JSON.stringify({ type: "send", channel: logname || name, data: data, sent: new Date() }));
+                        ws.send(JSON.stringify({ type: "send", channel: logname || name, data: data, sent: new Date().getTime() }));
                     }, 0);
                 }
                 //Web Socket is connected, send data using send()
