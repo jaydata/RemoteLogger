@@ -1,0 +1,10 @@
+{
+  "name": "WebService",
+  "version": "0.0.0",
+  "description": "WebService",
+  "main": "server.js",
+  "author": {
+    "name": "Peter",
+    "email": ""
+  }
+}
