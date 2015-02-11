@@ -89,7 +89,6 @@
 
             logger.onmessage = function (message) {
                 var stor = ".logview." + message.channel;
-                console.log(stor);
                 $(stor).prepend("<div>" + JSON.stringify(message.msg) + "</div>");
             }
 

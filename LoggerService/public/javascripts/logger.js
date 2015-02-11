@@ -9,10 +9,10 @@ function putter(name) {
 
 var loggerApi = {
     
-    createLogger: function (name) {
+    createLogger: function (name, uri) {
         var logger = {};
         return $.Deferred(function (defer) {
-            var ws = new WebSocket("ws://" + window.location.host  + "/ws");
+            var ws = new WebSocket("ws://" + (uri || window.location.host)  + "/ws");
             logger.socket = ws;
             ws.onopen = function()
             {
@@ -41,6 +41,6 @@ var loggerApi = {
             ws.onclose = function () {
                 alert("connection closed");
             }
-        });
+        }).promise(logger);
     }
 }

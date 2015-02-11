@@ -26,6 +26,15 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+module.exports = app;
+
+app.createRedisClient = function () {
+    //
+    console.log("creating redis client");
+    //return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
+    return redis.createClient();
+}
 //app.use('/', routes);
 app.use('/users', users);
 app.use('/log', require('./routes/log.js'));
@@ -61,7 +70,6 @@ app.use(function (err, req, res, next) {
 });
 
 
-module.exports = app;
 
 var appListen = app.listen;
 app.listen = function (port, done) {
@@ -78,8 +86,7 @@ app.listen = function (port, done) {
             switch (msg.type) {
                 case "sub":
                     //6379, "caravan-test-proxy1.cloudapp.net"
-                    var rc = clientSocket.receiver || (clientSocket.receiver = redis.createClient());
-                    console.log("subscribe to %s", msg.channel);
+                    var rc = clientSocket.receiver || (clientSocket.receiver = app.createRedisClient());
                     rc.subscribe(msg.channel, function (channel, count) {
                         console.log("subscribed to channeld", msg.channel);
                     });
@@ -94,7 +101,7 @@ app.listen = function (port, done) {
                 case "send":
                     //6379, "caravan-test-proxy1.cloudapp.net")
                     console.log("publishing message", msg.data);
-                    var rc = clientSocket.sender || (clientSocket.sender = redis.createClient());
+                    var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
                     rc.publish(msg.channel, JSON.stringify({ t: msg.sent, d: msg.data }));
                     console.log("publishing message done");
                     break;
