@@ -3,13 +3,13 @@ var redis = require('redis');
 
 var router = express.Router();
 
+var rc;
 /* GET users listing. */
 router.get('/', function (req, res) {
-    var rc = redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
+    rc = rc || redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
     rc.pubsub("channels", function (err, result) {
-        rc.end(function () {
-            res.json(result);
-        });
+        rc.end();
+        res.json(result);
     });
 });
 
