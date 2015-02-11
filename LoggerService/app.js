@@ -77,7 +77,8 @@ app.listen = function (port, done) {
             var msg = JSON.parse(msg);
             switch (msg.type) {
                 case "sub":
-                    var rc = clientSocket.receiver || (clientSocket.receiver = redis.createClient(6379, "caravan-test-proxy1.cloudapp.net"));
+                    //6379, "caravan-test-proxy1.cloudapp.net"
+                    var rc = clientSocket.receiver || (clientSocket.receiver = redis.createClient());
                     console.log("subscribe to %s", msg.channel);
                     rc.subscribe(msg.channel, function (channel, count) {
                         console.log("subscribed to channeld", msg.channel);
@@ -91,8 +92,9 @@ app.listen = function (port, done) {
                     }
                     break;
                 case "send":
+                    //6379, "caravan-test-proxy1.cloudapp.net")
                     console.log("publishing message", msg.data);
-                    var rc = clientSocket.sender || (clientSocket.sender = redis.createClient(6379, "caravan-test-proxy1.cloudapp.net"));
+                    var rc = clientSocket.sender || (clientSocket.sender = redis.createClient());
                     rc.publish(msg.channel, JSON.stringify({ t: msg.sent, d: msg.data }));
                     console.log("publishing message done");
                     break;
