@@ -14,17 +14,30 @@ var loggerApi = {
         return $.Deferred(function (defer) {
             var ws = new WebSocket("ws://" + (uri || window.location.host)  + "/ws");
             logger.socket = ws;
-            ws.onopen = function()
+            
+            logger.logs = [];
+            
+            logger.log = function (data, logname) {
+                logger.logs.push({ type: "send", channel: logname || name, data: data, sent: new Date().getTime() });
+            }
+            
+            ws.onopen = function ()
             {
                 logger.sub = function (logname) {
                     ws.send(JSON.stringify({ type: "sub", channel: logname }));
                 }
+                
+                window.setInterval(function () {
+                    if (logger.logs.length) {
+                        var _l = logger.logs;
+                        ws.send(JSON.stringify(_l));
+                        logger.logs = [];
+                    }
+                }, 500);
+                //window.setTimeout(function () {
+                //    ws.send(JSON.stringify());
+                //}, 0);
 
-                logger.log = function (data, logname) {
-                    window.setTimeout(function () {
-                        ws.send(JSON.stringify({ type: "send", channel: logname || name, data: data, sent: new Date().getTime() }));
-                    }, 0);
-                }
                 //Web Socket is connected, send data using send()
                 //ws.send(JSON.stringify({ text: "Message to send" }));
                 //alert("Message is sent...");

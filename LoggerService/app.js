@@ -32,8 +32,8 @@ module.exports = app;
 app.createRedisClient = function () {
     //
     console.log("creating redis client");
-    //return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
-    return redis.createClient();
+    return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
+    //return redis.createClient();
 }
 //app.use('/', routes);
 app.use('/users', users);
@@ -74,37 +74,44 @@ app.use(function (err, req, res, next) {
 var appListen = app.listen;
 app.listen = function (port, done) {
     var server = appListen.apply(app, [port, done]);
-    var wss = new WebSocketServer( {server: server, path: "/ws"
-});
+    var wss = new WebSocketServer({
+        server: server, path: "/ws"
+    });
     
     wss.on('connection', function (clientSocket) {
         console.log("wss connection", clientSocket);
-
+        
         clientSocket.on('message', function (msg) {
             console.log("client message arrived", msg);
             var msg = JSON.parse(msg);
-            switch (msg.type) {
-                case "sub":
-                    //6379, "caravan-test-proxy1.cloudapp.net"
-                    var rc = clientSocket.receiver || (clientSocket.receiver = app.createRedisClient());
-                    rc.subscribe(msg.channel, function (channel, count) {
-                        console.log("subscribed to channeld", msg.channel);
-                    });
-                    if (!clientSocket.reveiving) {
-                        clientSocket.reveiving = true;
-                        rc.on("message", function (channel, msg) {
-                            msg = JSON.parse(msg);
-                            clientSocket.send(JSON.stringify({ channel: channel, msg: msg }));
+            function dispatch(msg) {
+                switch (msg.type) {
+                    case "sub":
+                        //6379, "caravan-test-proxy1.cloudapp.net"
+                        var rc = clientSocket.receiver || (clientSocket.receiver = app.createRedisClient());
+                        rc.subscribe(msg.channel, function (channel, count) {
+                            console.log("subscribed to channeld", msg.channel);
                         });
-                    }
-                    break;
-                case "send":
-                    //6379, "caravan-test-proxy1.cloudapp.net")
-                    console.log("publishing message", msg.data);
-                    var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
-                    rc.publish(msg.channel, JSON.stringify({ t: msg.sent, d: msg.data }));
-                    console.log("publishing message done");
-                    break;
+                        if (!clientSocket.reveiving) {
+                            clientSocket.reveiving = true;
+                            rc.on("message", function (channel, msg) {
+                                msg = JSON.parse(msg);
+                                clientSocket.send(JSON.stringify({ channel: channel, msg: msg }));
+                            });
+                        }
+                        break;
+                    case "send":
+                        //6379, "caravan-test-proxy1.cloudapp.net")
+                        console.log("publishing message", msg.data);
+                        var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
+                        rc.publish(msg.channel, JSON.stringify({ t: msg.sent, d: msg.data }));
+                        console.log("publishing message done");
+                        break;
+                }
+            }            ;
+            msg = Array.isArray(msg) ? msg : [msg];
+            for (var i = 0; i < msg.length ; i++) {
+                dispatch(msg[i]);
             }
             //console.log("client message %s", msg);
             //clientSocket.send('echo ' + msg);
