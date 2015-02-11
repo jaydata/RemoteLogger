@@ -82,9 +82,12 @@ app.listen = function (port, done) {
                     rc.subscribe(msg.channel, function (channel, count) {
                         console.log("subscribed to channeld", msg.channel);
                     });
-                    rc.on("message", function (channel, msg) {
-                        clientSocket.send(msg);
-                    });
+                    if (!clientSocket.reveiving) {
+                        clientSocket.reveiving = true;
+                        rc.on("message", function (channel, msg) {
+                            clientSocket.send(JSON.stringify({ channel: channel, msg: msg }));
+                        });
+                    }
                     break;
                 case "send":
                     console.log("publishing message", msg.data);
