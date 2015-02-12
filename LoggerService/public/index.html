@@ -111,7 +111,8 @@
                 logger.sub(log);
             }
 
-            $(document).on("click", ".logview-container h3", function (evt) {
+            $(document).on("click", ".logview-container h3", function () {
+                console.log("clear", this);
                 $(this).parent().find(".loglist").empty();
             });
 
