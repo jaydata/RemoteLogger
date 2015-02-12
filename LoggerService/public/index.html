@@ -78,6 +78,13 @@
     <div class="logviews">
 
     </div>
+    <script id="logview" type="text/template">
+        <div class='logview-container'>
+            <h3>{{.}} <a href="#">X</a></h3>
+            <div class='logview {{.}}'>
+            </div>
+        </div>
+    </script>
     <script>
 
         var _loger = loggerApi.createLogger("log1", "caravan-test-proxy1.cloudapp.net:3000/ws");
@@ -100,7 +107,7 @@
             }
     
             function subtolog(log) {
-                $(".logviews").append(Mustache.render("<div class='logview-container'><h3>{{.}}</h3><div class='logview {{.}}'></div></div>", log));
+                $(".logviews").append(Mustache.render($("#logview").text(), log));
                 logger.sub(log);
             }
 
