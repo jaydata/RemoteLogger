@@ -93,9 +93,10 @@
 
             });
 
+            var counter = 0;
             logger.onmessage = function (message) {
                 var stor = ".logview." + message.channel;
-                $(stor).prepend("<div>" + JSON.stringify(message.msg) + "</div>");
+                $(stor).prepend("<div><span>" + counter++ + " </span>" + JSON.stringify(message.msg) + "</div>");
             }
     
             function subtolog(log) {
