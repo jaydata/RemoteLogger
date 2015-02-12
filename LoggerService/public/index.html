@@ -80,7 +80,7 @@
     </div>
     <script id="logview" type="text/template">
         <div class='logview-container'>
-            <h3>{{.}} <a href="#">X</a></h3>
+            <h3>{{.}}</h3>
             <div class='logview {{.}}'>
             </div>
         </div>
@@ -110,6 +110,10 @@
                 $(".logviews").append(Mustache.render($("#logview").text(), log));
                 logger.sub(log);
             }
+
+            $(document).on("click", ".logview-container h3", function (evt) {
+                $(this).parent().find(".loglist").empty();
+            });
 
             $("button").on("click", function () {
                 subtolog($('.logname').val());
