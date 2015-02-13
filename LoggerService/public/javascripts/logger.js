@@ -35,7 +35,7 @@ var loggerApi = {
             ws.onopen = function ()
             {
                 logger.sub = function (logname) {
-                    ws.send(JSON.stringify([ messageType.sub, logname, null, null]));
+                    ws.send(JSON.stringify([[ messageType.sub, logname, null, null]]));
                 }
                 
                 window.setInterval(function () {
