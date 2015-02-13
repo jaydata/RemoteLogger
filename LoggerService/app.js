@@ -89,7 +89,7 @@ app.listen = function (port, done) {
         console.log("wss connection");
         
         clientSocket.on('message', function (msg) {
-            console.log("client message arrived", msg);
+            console.log("client message arrived", (msg || "").length);
             var msg = JSON.parse(msg);
             function dispatch(msg) {
                 switch (msg[messageField.type]) {

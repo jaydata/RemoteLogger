@@ -19,7 +19,28 @@ var messageType = {
 }
 
 var loggerApi = {
-    
+    createLoggerLight: function (name, uri) {
+        var logger = {};
+        
+        var ws = new WebSocket("ws://" + uri || (window.location.host + "/ws"));
+        ws.onopen = function () {
+            window.setInterval(function () {
+                if (logger.logs.length) {
+                    var _l = logger.logs;
+                    ws.send(JSON.stringify(_l));
+                    logger.logs = [];
+                }
+            }, 500);
+        };
+        logger.socket = ws;
+        
+        logger.logs = [];
+        
+        logger.log = function (data, logname) {
+            logger.logs.push([messageType.send, logname || name, data, new Date().getTime()]);
+        };
+        return logger;
+    },
     createLogger: function (name, uri) {
         var logger = {};
         return $.Deferred(function (defer) {
