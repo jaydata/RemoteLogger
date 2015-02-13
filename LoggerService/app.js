@@ -112,7 +112,7 @@ app.listen = function (port, done) {
                         //console.log("publishing message", msg.data);
                         var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
                         rc.publish(msg[messageField.channel], JSON.stringify({
-                            t: msg[messageField.sent], 
+                            t: msg[messageField.timestamp], 
                             d: msg[messageField.data]
                         }));
                         //console.log("publishing message done");
