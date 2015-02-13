@@ -7,6 +7,17 @@ function putter(name) {
     }
 }
 
+var messageField = {
+    type: 0,
+    channel: 1,
+    data: 2,
+    timestamp: 3
+};
+var messageType = {
+    sub: 0,
+    send: 1
+}
+
 var loggerApi = {
     
     createLogger: function (name, uri) {
@@ -18,13 +29,13 @@ var loggerApi = {
             logger.logs = [];
             
             logger.log = function (data, logname) {
-                logger.logs.push({ type: "send", channel: logname || name, data: data, sent: new Date().getTime() });
+                logger.logs.push([ messageType.send, logname || name, data, new Date().getTime()]);
             }
             
             ws.onopen = function ()
             {
                 logger.sub = function (logname) {
-                    ws.send(JSON.stringify({ type: "sub", channel: logname }));
+                    ws.send(JSON.stringify([ messageType.sub, logname, null, null]));
                 }
                 
                 window.setInterval(function () {
