@@ -5,8 +5,6 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "LoggerService", "LoggerService\LoggerService.njsproj", "{E04F968F-04E8-4983-9C9B-4D97508B2DF6}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "LogService", "LogService\LogService.njsproj", "{861CAAA8-25A6-47F9-A96C-FDE06261047A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{E04F968F-04E8-4983-9C9B-4D97508B2DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E04F968F-04E8-4983-9C9B-4D97508B2DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E04F968F-04E8-4983-9C9B-4D97508B2DF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{861CAAA8-25A6-47F9-A96C-FDE06261047A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{861CAAA8-25A6-47F9-A96C-FDE06261047A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{861CAAA8-25A6-47F9-A96C-FDE06261047A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{861CAAA8-25A6-47F9-A96C-FDE06261047A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

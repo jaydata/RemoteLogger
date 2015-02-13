@@ -112,7 +112,7 @@
             }
 
             $(document).on("click", ".logview-container h3", function () {
-                console.log("clear", this);
+                console.log("clear", this); counter = 0;
                 $(this).parent().find(".logview").empty();
             });
 

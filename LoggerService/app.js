@@ -68,8 +68,16 @@ app.use(function (err, req, res, next) {
         error: {}
     });
 });
-
-
+var messageField = {
+    type: 0,
+    channel: 1,
+    data: 2,
+    timestamp: 3
+};
+var messageType  = {
+    sub: 0,
+    send: 1
+}
 var appListen = app.listen;
 app.listen = function (port, done) {
     var server = appListen.apply(app, [port, done]);
@@ -84,26 +92,29 @@ app.listen = function (port, done) {
             console.log("client message arrived", msg);
             var msg = JSON.parse(msg);
             function dispatch(msg) {
-                switch (msg.type) {
-                    case "sub":
+                switch (msg[messageField.type]) {
+                    case messageType.sub:
                         //6379, "caravan-test-proxy1.cloudapp.net"
                         var rc = clientSocket.receiver || (clientSocket.receiver = app.createRedisClient());
-                        rc.subscribe(msg.channel, function (channel, count) {
-                            console.log("subscribed to channeld", msg.channel);
+                        rc.subscribe(msg[messageField.channel], function (channel, count) {
+                            console.log("subscribed to channeld", msg[messageField.channel]);
                         });
                         if (!clientSocket.reveiving) {
                             clientSocket.reveiving = true;
                             rc.on("message", function (channel, msg) {
                                 msg = JSON.parse(msg);
-                                clientSocket.send(JSON.stringify({ channel: channel, msg: msg }));
+                                clientSocket.send(JSON.stringify([messageType.send, channel, msg, null]));
                             });
                         }
                         break;
-                    case "send":
+                    case messageType.send:
                         //6379, "caravan-test-proxy1.cloudapp.net")
                         //console.log("publishing message", msg.data);
                         var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
-                        rc.publish(msg.channel, JSON.stringify({ t: msg.sent, d: msg.data }));
+                        rc.publish(msg[messageField.channel], JSON.stringify({
+                            t: msg[messageField.sent], 
+                            d: msg[messageField.data]
+                        }));
                         //console.log("publishing message done");
                         break;
                 }
