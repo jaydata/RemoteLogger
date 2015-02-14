@@ -32,8 +32,8 @@ module.exports = app;
 app.createRedisClient = function () {
     //
     console.log("creating redis client");
-    //return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
-    return redis.createClient();
+    return redis.createClient(6379, "caravan-test-proxy1.cloudapp.net");
+    //return redis.createClient();
 }
 //app.use('/', routes);
 app.use('/users', users);
@@ -72,12 +72,15 @@ var messageField = {
     type: 0,
     channel: 1,
     data: 2,
-    timestamp: 3
+    timestamp: 3,
+    correlation: 4,
+    parentcorrelation: 5
 };
-var messageType  = {
+var messageType = {
     sub: 0,
     send: 1
 }
+
 var appListen = app.listen;
 app.listen = function (port, done) {
     var server = appListen.apply(app, [port, done]);
@@ -89,39 +92,54 @@ app.listen = function (port, done) {
         console.log("wss connection");
         
         clientSocket.on('message', function (msg) {
+            var parsedMsg, isBatch, channel, end;
             console.log("client message arrived", (msg || "").length);
-            var msg = JSON.parse(msg);
-            function dispatch(msg) {
-                switch (msg[messageField.type]) {
+            
+            if (msg[0] == "<" && msg[1] == "@") {
+                console.log("batch message");
+                parsedMsg = msg;
+                end = msg.indexOf("@>");
+                channel = msg.substring(2, end);
+                isBatch = true;
+                //console.log(msg, channel);
+            } else {
+                parsedMsg = JSON.parse(msg);
+            }
+
+            function dispatch(msg, c, op) {
+                var op = op || msg[messageField.type], 
+                    c = c || msg[messageField.channel];
+
+                console.log("dispatch", channel, op);
+                switch (op) {
                     case messageType.sub:
+                        console.log("sub message dispatch");
                         //6379, "caravan-test-proxy1.cloudapp.net"
                         var rc = clientSocket.receiver || (clientSocket.receiver = app.createRedisClient());
-                        rc.subscribe(msg[messageField.channel], function (channel, count) {
-                            console.log("subscribed to channeld", msg[messageField.channel]);
+                        rc.subscribe(c, function (channel, count) {
+                            console.log("subscribed to channeld", c);
                         });
                         if (!clientSocket.reveiving) {
                             clientSocket.reveiving = true;
                             rc.on("message", function (channel, msg) {
-                                msg = JSON.parse(msg);
-                                clientSocket.send(JSON.stringify([messageType.send, channel, msg, null]));
+                                clientSocket.send(msg);
                             });
                         }
                         break;
                     case messageType.send:
-                        //6379, "caravan-test-proxy1.cloudapp.net")
-                        //console.log("publishing message", msg.data);
+                        console.log("publishing message");
                         var rc = clientSocket.sender || (clientSocket.sender = app.createRedisClient());
-                        rc.publish(msg[messageField.channel], JSON.stringify({
-                            t: msg[messageField.timestamp], 
-                            d: msg[messageField.data]
-                        }));
-                        //console.log("publishing message done");
+                        rc.publish(channel || msg[messageField.channel], msg);
                         break;
                 }
-            }            ;
-            msg = Array.isArray(msg) ? msg : [msg];
-            for (var i = 0; i < msg.length ; i++) {
-                dispatch(msg[i]);
+            };
+            //msg = Array.isArray(msg) ? msg : [msg];
+            if (isBatch) {
+                dispatch(msg, channel, messageType.send);            
+            } else {
+                for (var i = 0; i < parsedMsg.length ; i++) {
+                    dispatch(parsedMsg[i]);
+                }
             }
             //console.log("client message %s", msg);
             //clientSocket.send('echo ' + msg);

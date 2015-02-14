@@ -85,13 +85,24 @@
             </div>
         </div>
     </script>
-    <script>
 
-        var _loger = loggerApi.createLogger("log1", "caravan-test-proxy1.cloudapp.net:3000/ws");
-        _loger.log("asdasd");
-        _loger.log("dasdasd");
+    <script id="logline-view" type="text/template">
+        <div>
+            <span>{{counter}}</span>
+            <span>{{span}}</span>
+            <span>{{2}}</span>
+        </div>
+    </script>
+    <script>
+        var llight = loggerApi.createLoggerLight("log1", "localhost:1337/ws"),
+            _startProcess = llight.pstart,
+            _log = llight.log;
+        var _loger = loggerApi.createLogger("log1", "localhost:1337/ws");
+            _loger.log("asdasd");
+            _loger.log("dasdasd");
         _loger.then(function (logger) {
             lg = logger;
+
             $.get("/log").then(function (result) {
                 result.forEach(function (item) {
                     $(".loglist").append(Mustache.render("<div data-item='{{.}}'>{{.}}</div>", item));
@@ -101,9 +112,16 @@
             });
 
             var counter = 0;
+            var itemTemplate = $('#logline-view').text();
+
+            var lastMessage;
+
             logger.onmessage = function (message) {
                 var stor = ".logview." + message[messageField.channel];
-                $(stor).prepend("<div><span>" + counter++ + " </span>" + JSON.stringify(message[messageField.data]) + "</div>");
+                message.counter = counter++;
+                lastMessage && (message.span = (message[3] - lastMessage[3]));
+                lastMessage = message;
+                $(stor).prepend(Mustache.render(itemTemplate, message));
             }
     
             function subtolog(log) {
@@ -124,6 +142,9 @@
                 var log = $(this).data("item");
                 subtolog(log);
             })
+
+            subtolog("log1");
+
         });
 
 
