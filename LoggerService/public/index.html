@@ -66,6 +66,11 @@
             height:100%;
             overflow:auto;
         }
+
+        .logline span {
+            display:inline-block;
+            width:80px;
+        }
     </style>
 </head>
 <body>
@@ -87,17 +92,22 @@
     </script>
 
     <script id="logline-view" type="text/template">
-        <div>
+        <div class="logline">
             <span>{{counter}}</span>
             <span>{{span}}</span>
+            <span>{{processDuration}}</span>
             <span>{{2}}</span>
         </div>
     </script>
     <script>
-        var llight = loggerApi.createLoggerLight("log1", "localhost:1337/ws"),
+        var r = "caravan-test-proxy1.cloudapp.net:3000/ws";
+        var l = "localhost:1337/ws";
+        var server = r;
+
+        var llight = loggerApi.createLoggerLight("log1", server),
             _startProcess = llight.pstart,
             _log = llight.log;
-        var _loger = loggerApi.createLogger("log1", "localhost:1337/ws");
+        var _loger = loggerApi.createLogger("log1", server);
             _loger.log("asdasd");
             _loger.log("dasdasd");
         _loger.then(function (logger) {
@@ -116,11 +126,24 @@
 
             var lastMessage;
 
+            var msgCache = {};
+
             logger.onmessage = function (message) {
                 var stor = ".logview." + message[messageField.channel];
                 message.counter = counter++;
                 lastMessage && (message.span = (message[3] - lastMessage[3]));
                 lastMessage = message;
+                var corrid;
+                if (message.length > 4) {
+                    if (corrid = message[4]) {
+                        if (corrid > 0) {
+                            msgCache[corrid] = message;
+                        } else {
+                            corrid = Math.abs(corrid);
+                            message.processDuration = message[3] - msgCache[corrid][3];
+                        }
+                    }
+                }
                 $(stor).prepend(Mustache.render(itemTemplate, message));
             }
     
